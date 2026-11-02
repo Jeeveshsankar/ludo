@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeySakhi Ludo — Futuristic Light Edition</title>
+  <style>
+    :root {
+      --primary: #7C3AED;
+      --primary-light: #F3E8FF;
+      --primary-glow: rgba(124, 58, 237, 0.28);
+      --accent-pink: #EC4899;
+      --pink-glow: rgba(236, 72, 153, 0.35);
+      --text-dark: #1E1B4B;
+      --text-muted: #64748B;
+      --border-subtle: #E2E8F0;
+      --card-bg: rgba(255, 255, 255, 0.94);
+      
+      --color-red: #EF4444;
+      --color-green: #10B981;
+      --color-yellow: #F59E0B;
+      --color-blue: #3B82F6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: radial-gradient(120% 120% at 50% 0%, #FAF5FF 0%, #F5F3FF 45%, #EFF6FF 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* Ambient Glow Orbs */
+    .ambient-glow {
+      position: fixed;
+      width: 450px;
+      height: 450px;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-1 { top: -100px; left: calc(50% - 300px); background: #E9D5FF; }
+    .glow-2 { bottom: -100px; right: calc(50% - 300px); background: #FCE7F3; }
+
+    /* Top Brand Minimal Bar */
+    .brand-topbar {
+      margin-bottom: 8px;
+      text-align: center;
+      z-index: 10;
+    }
+    .brand-topbar h1 {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, #6D28D9 0%, #EC4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-topbar p {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    /* Device Mockup Frame: Scaled perfectly to fit viewport */
+    .device-viewport {
+      width: 380px;
+      height: 750px;
+      max-height: calc(100vh - 40px);
+      background: #FFFFFF;
+      border-radius: 46px;
+      box-shadow: 
+        0 25px 60px -12px rgba(124, 58, 237, 0.18),
+        0 0 0 8px #FFFFFF,
+        0 0 0 10px rgba(226, 232, 240, 0.8),
+        inset 0 0 20px rgba(124, 58, 237, 0.02);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 106px;
+      height: 26px;
+      background: #000000;
+      border-radius: 18px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .island-lens {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #111;
+      border: 1px solid #333;
+    }
+    .island-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #0E3A5A;
+    }
+
+    /* Native Status Bar (Proper Top Spacing) */
+    .status-bar {
+      height: 44px;
+      padding: 12px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-dark);
+      z-index: 90;
+      background: transparent;
+    }
+
+    /* App Screen Container */
+    .screen-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-y: auto;
+      padding-bottom: 24px;
+    }
+
+    /* Clean Navigation Header */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 16px 10px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .nav-btn {
+      background: var(--primary-light);
+      border: none;
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: #EDE9FE;
+    }
+    .app-header-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--text-dark);
+      letter-spacing: 1.5px;
+    }
+
+    /* ============================================================== */
+    /* PREMIUM FUTURISTIC GAMING CARDS                                 */
+    /* ============================================================== */
+    .portal-hero-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 255, 0.94) 100%);
+      border-radius: 22px;
+      padding: 16px;
+      border: 1.5px solid #C7D2FE;
+      box-shadow: 0 10px 28px -6px rgba(99, 102, 241, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .portal-hero-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, #6366F1, #8B5CF6, #EC4899);
+    }
+
+    .offline-gaming-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(253, 242, 248, 0.5) 100%);
+      border-radius: 22px;
+      padding: 16px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 8px 24px -6px rgba(236, 72, 153, 0.12);
+      margin-bottom: 12px;
+    }
+
+    .stats-dashboard-card {
+      background: #FFFFFF;
+      border-radius: 22px;
+      padding: 14px 16px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+      margin-bottom: 6px;
+    }
+
+    /* Glow Action Buttons */
+    .btn-portal-glow {
+      background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+      color: #FFFFFF;
+      padding: 13px;
+      border-radius: 14px;
+      border: none;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 20px var(--primary-glow);
+      text-align: center;
+      letter-spacing: 0.8px;
+      transition: transform 0.15s, opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-portal-glow:active {
+      transform: scale(0.98);
+    }
+
+    .btn-pink-glow {
+      background: linear-gradient(135deg, #EC4899 0%, #F43F5E 100%);
+      color: #FFFFFF;
+      padding: 13px;
+      border-radius: 14px;
+      border: none;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 20px var(--pink-glow);
+      text-align: center;
+      letter-spacing: 0.8px;
+      transition: transform 0.15s, opacity 0.2s;
+    }
+    .btn-pink-glow:active {
+      transform: scale(0.98);
+    }
+
+    /* Segmented Player Picker */
+    .segmented-picker {
+      display: flex;
+      background: #F1F5F9;
+      border-radius: 12px;
+      padding: 3px;
+      gap: 3px;
+      margin-bottom: 12px;
+    }
+    .segment-tab {
+      flex: 1;
+      padding: 9px 0;
+      text-align: center;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .segment-tab.active {
+      background: #FFFFFF;
+      color: var(--accent-pink);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Badges & Pills */
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .pill-online {
+      background: #EEF2FF;
+      color: #4F46E5;
+    }
+    .pill-offline {
+      background: #FCE7F3;
+      color: #DB2777;
+    }
+    .dot-live {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4F46E5;
+      box-shadow: 0 0 6px #6366F1;
+      animation: pulse-dot 1.5s infinite;
+    }
+    @keyframes pulse-dot {
+      0% { opacity: 0.6; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.15); }
+      100% { opacity: 0.6; transform: scale(0.9); }
+    }
+
+    /* LUDO BOARD & GAMEPLAY */
+    .turn-hud-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #FFFFFF;
+      margin: 6px 14px 2px;
+      padding: 7px 14px;
+      border-radius: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+    .turn-indicator-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--color-red);
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .board-stage-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 8px;
+    }
+    .ludo-board-card {
+      width: 340px;
+      height: 340px;
+      background: #FFFFFF;
+      border-radius: 18px;
+      position: relative;
+      box-shadow: 0 8px 30px rgba(124, 58, 237, 0.08);
+      border: 1.5px solid var(--border-subtle);
+      overflow: hidden;
+    }
+    .ludo-board-card svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .tokens-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .token-item {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 20;
+    }
+    .token-item.highlight-legal {
+      border: 2.5px solid #FFFFFF;
+      animation: token-glow-pulse 0.7s infinite alternate;
+      z-index: 30;
+      cursor: pointer;
+    }
+    @keyframes token-glow-pulse {
+      0% { transform: translate(-50%, -50%) scale(1); filter: drop-shadow(0 0 3px rgba(236,72,153,0.7)); }
+      100% { transform: translate(-50%, -50%) scale(1.22); filter: drop-shadow(0 0 10px rgba(245,158,11,1)); }
+    }
+    .token-item .inner-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Gameplay Bottom HUD */
+    .gameplay-bottom-hud {
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-subtle);
+      padding: 10px 16px 20px;
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.03);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hud-player-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hud-avatar-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--color-red);
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-size: 18px;
+      font-weight: 900;
+    }
+    .hud-player-text h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+    .hud-player-text p {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--color-red);
+      letter-spacing: 0.5px;
+      margin-top: 1px;
+    }
+
+    /* Dice */
+    .dice-hud-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+    .dice-cube-frame {
+      width: 54px;
+      height: 54px;
+      border-radius: 15px;
+      background: #FFFFFF;
+      border: 2.5px solid var(--color-red);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    .dice-cube-frame.is-rolling {
+      animation: dice-cube-spin 0.35s infinite linear;
+    }
+    @keyframes dice-cube-spin {
+      0% { transform: rotate(0deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(1.1); }
+    }
+    .dice-cube-face {
+      width: 100%;
+      height: 100%;
+      background: #FFFFFF;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text-dark);
+    }
+    .dice-cube-hint {
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .home-indicator-bar {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 4px;
+      background: #CBD5E1;
+      border-radius: 2px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glow Background -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- Mobile Viewport Frame -->
+  <div class="device-viewport">
+    <!-- Dynamic Island -->
+    <div class="dynamic-island">
+      <div class="island-lens"></div>
+      <div class="island-dot"></div>
+    </div>
+
+    <!-- Status Bar (Clean & Proper Top Spacing) -->
+    <div class="status-bar">
+      <span>9:41</span>
+      <span>5G &nbsp; 100%</span>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 1. SCREEN: HOME (Apple Minimalist Edition)    -->
+    <!-- ============================================== -->
+    <div class="screen-view" id="screen-home" style="display: flex; padding: 16px 18px;">
+      <!-- Minimal Header -->
+      <div style="text-align: center; margin: 10px 0 20px;">
+        <h2 style="font-size: 26px; font-weight: 800; color: #1E1B4B; letter-spacing: -0.5px;">HeySakhi Ludo</h2>
+        <p style="font-size: 13px; font-weight: 500; color: #64748B; margin-top: 4px;">Modern multiplayer classic</p>
+      </div>
+
+      <!-- PRIMARY: Online Multiplayer Card -->
+      <div style="background: #FFFFFF; border-radius: 20px; border: 1px solid #E8E8F2; padding: 20px; box-shadow: 0 4px 16px rgba(124, 58, 237, 0.05); margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <div style="display: inline-flex; align-items: center; gap: 6px;">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #10B981;"></div>
+            <span style="font-size: 12px; font-weight: 600; color: #10B981;">Online</span>
+          </div>
+        </div>
+
+        <h3 style="font-size: 18px; font-weight: 700; color: #0F172A; margin-bottom: 4px;">Online Multiplayer</h3>
+        <p style="font-size: 13px; color: #64748B; line-height: 18px; margin-bottom: 16px;">Create private rooms, invite friends with codes, or jump into quick matchmaking.</p>
+
+        <button style="width: 100%; background: #7C3AED; color: #FFFFFF; border: none; border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);" onclick="navigateToScreen('screen-online-mode')">
+          <span>Play Online</span>
+          <span style="font-size: 16px;">→</span>
+        </button>
+      </div>
+
+      <!-- SECONDARY: Pass & Play Card -->
+      <div style="background: #FFFFFF; border-radius: 20px; border: 1px solid #E8E8F2; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02); margin-bottom: 20px;">
+        <h3 style="font-size: 17px; font-weight: 700; color: #0F172A; margin-bottom: 4px;">Pass & Play</h3>
+        <p style="font-size: 13px; color: #64748B; margin-bottom: 14px;">Enjoy a game together on one device.</p>
+
+        <div style="display: flex; background: #F1F5F9; border-radius: 10px; padding: 3px; margin-bottom: 14px;">
+          <div class="segment-tab active" style="flex: 1; text-align: center; padding: 8px; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer;" onclick="setOfflineCount(2, this)">2 Players</div>
+          <div class="segment-tab" style="flex: 1; text-align: center; padding: 8px; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer;" onclick="setOfflineCount(3, this)">3 Players</div>
+          <div class="segment-tab" style="flex: 1; text-align: center; padding: 8px; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer;" onclick="setOfflineCount(4, this)">4 Players</div>
+        </div>
+
+        <button style="width: 100%; background: #F8F9FE; color: #4B5563; border: 1px solid #E2E8F0; border-radius: 12px; padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer;" onclick="startOfflineGame()">Start Local Match</button>
+      </div>
+
+      <!-- SUPPORTING: Career Statistics -->
+      <div style="padding: 0 4px;">
+        <div style="font-size: 12px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Career Statistics</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; background: #FFFFFF; border-radius: 16px; border: 1px solid #E8E8F2; padding: 14px 18px;">
+          <div style="text-align: center;">
+            <div style="font-size: 17px; font-weight: 800; color: #0F172A;">12</div>
+            <div style="font-size: 11px; color: #64748B; font-weight: 500; margin-top: 2px;">Matches</div>
+          </div>
+          <div style="width: 1px; height: 24px; background: #E2E8F0;"></div>
+          <div style="text-align: center;">
+            <div style="font-size: 17px; font-weight: 800; color: #0F172A;">9</div>
+            <div style="font-size: 11px; color: #64748B; font-weight: 500; margin-top: 2px;">Wins</div>
+          </div>
+          <div style="width: 1px; height: 24px; background: #E2E8F0;"></div>
+          <div style="text-align: center;">
+            <div style="font-size: 17px; font-weight: 800; color: #0F172A;">24</div>
+            <div style="font-size: 11px; color: #64748B; font-weight: 500; margin-top: 2px;">Captures</div>
+          </div>
+          <div style="width: 1px; height: 24px; background: #E2E8F0;"></div>
+          <div style="text-align: center;">
+            <div style="font-size: 17px; font-weight: 800; color: #7C3AED;">75%</div>
+            <div style="font-size: 11px; color: #64748B; font-weight: 500; margin-top: 2px;">Win Rate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 2. SCREEN: ONLINE MODE SELECTION               -->
+    <!-- ============================================== -->
+    <div class="screen-view" id="screen-online-mode" style="display: none; padding: 14px;">
+      <div class="app-header" style="margin: -14px -14px 14px;">
+        <button class="nav-btn" onclick="navigateToScreen('screen-home')">← Home</button>
+        <span class="app-header-title">ONLINE ARENA</span>
+        <div style="width: 48px;"></div>
+      </div>
+
+      <div style="background: #FFFFFF; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--border-subtle); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 12px; font-weight: 700; color: var(--text-dark);">Player Name:</span>
+        <input type="text" id="online-player-name" value="SakhiPlayer" style="flex: 1; border: none; font-size: 14px; font-weight: 800; color: var(--primary); outline: none;">
+      </div>
+
+      <!-- Mode 1: Create Room -->
+      <div class="portal-hero-card" style="cursor: pointer; padding: 14px;" onclick="navigateToScreen('screen-create-room')">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 42px; height: 42px; border-radius: 21px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 20px;">👑</div>
+          <div style="flex: 1;">
+            <h4 style="font-size: 14px; font-weight: 900; color: var(--text-dark);">Create Private Room</h4>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Generate a unique room code to invite friends.</p>
+          </div>
+          <span style="font-size: 18px; color: var(--primary);">›</span>
+        </div>
+      </div>
+
+      <!-- Mode 2: Join Room -->
+      <div class="portal-hero-card" style="cursor: pointer; padding: 14px;" onclick="navigateToScreen('screen-join-room')">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 42px; height: 42px; border-radius: 21px; background: #DBEAFE; display: flex; align-items: center; justify-content: center; font-size: 20px;">🔑</div>
+          <div style="flex: 1;">
+            <h4 style="font-size: 14px; font-weight: 900; color: var(--text-dark);">Join with Room Code</h4>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Enter a 6-character room code from your friend.</p>
+          </div>
+          <span style="font-size: 18px; color: #1D4ED8;">›</span>
+        </div>
+      </div>
+
+      <!-- Mode 3: Quick Match -->
+      <div class="portal-hero-card" style="cursor: pointer; padding: 14px;" onclick="navigateToScreen('screen-matchmaking')">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 42px; height: 42px; border-radius: 21px; background: #D1FAE5; display: flex; align-items: center; justify-content: center; font-size: 20px;">⚡</div>
+          <div style="flex: 1;">
+            <h4 style="font-size: 14px; font-weight: 900; color: var(--text-dark);">Quick Match (Matchmaking)</h4>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Queue up to be instantly matched online.</p>
+          </div>
+          <span style="font-size: 18px; color: #047857;">›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 3. SCREEN: CREATE ROOM                         -->
+    <!-- ============================================== -->
+    <div class="screen-view" id="screen-create-room" style="display: none; padding: 14px;">
+      <div class="app-header" style="margin: -14px -14px 14px;">
+        <button class="nav-btn" onclick="navigateToScreen('screen-online-mode')">← Back</button>
+        <span class="app-header-title">CREATE ROOM</span>
+        <div style="width: 48px;"></div>
+      </div>
+
+      <div class="portal-hero-card">
+        <h4 style="font-size: 14px; font-weight: 800; margin-bottom: 8px;">Select Player Capacity</h4>
+        <div class="segmented-picker" style="margin-bottom: 16px;">
+          <div class="segment-tab" onclick="setCreateCapacity(2, this)">2 Players</div>
+          <div class="segment-tab" onclick="setCreateCapacity(3, this)">3 Players</div>
+          <div class="segment-tab active" onclick="setCreateCapacity(4, this)">4 Players</div>
+        </div>
+
+        <button class="btn-pink-glow" style="width: 100%;" onclick="executeCreateRoomBackend()">GENERATE PRIVATE ROOM</button>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 4. SCREEN: JOIN ROOM                           -->
+    <!-- ============================================== -->
+    <div class="screen-view" id="screen-join-room" style="display: none; padding: 14px;">
+      <div class="app-header" style="margin: -14px -14px 14px;">
+        <button class="nav-btn" onclick="navigateToScreen('screen-online-mode')">← Back</button>
+        <span class="app-header-title">JOIN ROOM</span>
+        <div style="width: 48px;"></div>
+      </div>
+
+      <div class="portal-hero-card">
+        <h4 style="font-size: 14px; font-weight: 800; margin-bottom: 8px;">Enter Room Code</h4>
+        <input type="text" id="join-room-code-input" placeholder="e.g. SAKHIA1B" style="width: 100%; padding: 14px; background: #F8F9FE; border: 1px solid var(--border-subtle); border-radius: 12px; font-size: 20px; font-weight: 900; letter-spacing: 4px; text-align: center; text-transform: uppercase; margin-bottom: 14px; outline: none;">
+        
+        <div id="join-error-box" style="display: none; background: #FEE2E2; color: #B91C1C; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 12px;"></div>
+
+        <button class="btn-portal-glow" style="width: 100%;" onclick="executeJoinRoomBackend()">CONNECT TO ROOM</button>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 5. SCREEN: MATCHMAKING                         -->
+    <!-- ============================================== -->
+    <div class="screen-view" id="screen-matchmaking" style="display: none; padding: 14px; text-align: center;">
+      <div class="app-header" style="margin: -14px -14px 14px;">
+        <button class="nav-btn" onclick="navigateToScreen('screen-online-mode')">✕ Cancel</button>
+        <span class="app-header-title">MATCHMAKING</span>
+        <div style="width: 48px;"></div>
+      </div>
+
+      <div class="portal-hero-card" style="padding: 30px 20px; align-items: center;">
+        <div style="font-size: 36px; animation: dice-cube-spin 2s infinite linear;">⚡</div>
+        <h3 style="font-size: 17px; font-weight: 800; margin-top: 10px;">Finding Opponents...</h3>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Searching for live active players.</p>
+
+        <button class="btn-portal-glow" style="margin-top: 20px; width: 100%;" onclick="executeQuickMatchBackend(2)">FIND 2-PLAYER MATCH</button>
+        <button class="btn-pink-glow" style="margin-top: 10px; width: 100%;" onclick="executeQuickMatchBackend(4)">FIND 4-PLAYER MATCH</button>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 6. SCREEN: MULTIPLAYER LOBBY                   -->
+    <!-- ============================================== -->
+    <div class="screen-view" id="screen-lobby" style="display: none; padding: 14px;">
+      <div class="app-header" style="margin: -14px -14px 14px;">
+        <button class="nav-btn" onclick="leaveOnlineLobby()">✕ Leave</button>
+        <span class="app-header-title">ROOM LOBBY</span>
+        <div style="width: 48px;"></div>
+      </div>
+
+      <div style="background: #FFFFFF; border-radius: 18px; padding: 14px; border: 1.5px solid var(--primary); text-align: center; margin-bottom: 12px; box-shadow: 0 4px 16px var(--primary-glow);">
+        <span style="font-size: 9px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px;">SHARE ROOM CODE</span>
+        <div id="lobby-code-display" style="font-size: 28px; font-weight: 900; letter-spacing: 5px; color: var(--accent-pink); margin: 4px 0;">SAKHI99</div>
+        <button class="nav-btn" onclick="copyShareCode()">🔗 Copy & Share Code</button>
+      </div>
+
+      <h4 style="font-size: 12px; font-weight: 800; margin-bottom: 8px;">Connected Players (<span id="lobby-count">1</span>/<span id="lobby-capacity">4</span>)</h4>
+      <div id="lobby-players-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;"></div>
+
+      <button class="nav-btn" style="padding: 12px; margin-bottom: 8px; text-align: center; font-size: 12px;" onclick="toggleLobbyReady()">TOGGLE READY STATUS</button>
+      <button class="btn-pink-glow" id="btn-start-online" onclick="hostStartOnlineGame()">START GAME</button>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 7. SCREEN: GAMEPLAY                            -->
+    <!-- ============================================== -->
+    <div class="screen-view" id="screen-game" style="display: none; padding: 0;">
+      <div class="app-header">
+        <button class="nav-btn" onclick="exitGameplay()">✕ Exit</button>
+        <span class="app-header-title">HEYSAKHI LUDO</span>
+        <span style="font-size: 9px; font-weight: 800; color: var(--accent-pink); background: #FDF2F8; padding: 3px 8px; border-radius: 6px;" id="game-mode-label">OFFLINE</span>
+      </div>
+
+      <div class="turn-hud-banner">
+        <div class="turn-indicator-dot" id="turn-dot-color"></div>
+        <span id="banner-text">Player 1's Turn</span>
+      </div>
+
+      <div class="board-stage-wrapper">
+        <div class="ludo-board-card">
+          <svg viewBox="0 0 360 360">
+            <rect width="360" height="360" fill="#FFFFFF" rx="12"/>
+
+            <!-- Green Quadrant (Top-Left) -->
+            <rect x="0" y="0" width="144" height="144" fill="#10B981" rx="8"/>
+            <rect x="24" y="24" width="96" height="96" fill="#FFFFFF" rx="10"/>
+            <circle cx="44" cy="44" r="14" fill="#D1FAE5" stroke="#10B981" stroke-width="1.5"/>
+            <circle cx="100" cy="44" r="14" fill="#D1FAE5" stroke="#10B981" stroke-width="1.5"/>
+            <circle cx="44" cy="100" r="14" fill="#D1FAE5" stroke="#10B981" stroke-width="1.5"/>
+            <circle cx="100" cy="100" r="14" fill="#D1FAE5" stroke="#10B981" stroke-width="1.5"/>
+
+            <!-- Yellow Quadrant (Top-Right) -->
+            <rect x="216" y="0" width="144" height="144" fill="#F59E0B" rx="8"/>
+            <rect x="240" y="24" width="96" height="96" fill="#FFFFFF" rx="10"/>
+            <circle cx="260" cy="44" r="14" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+            <circle cx="316" cy="44" r="14" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+            <circle cx="260" cy="100" r="14" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+            <circle cx="316" cy="100" r="14" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+
+            <!-- Red Quadrant (Bottom-Left) -->
+            <rect x="0" y="216" width="144" height="144" fill="#EF4444" rx="8"/>
+            <rect x="24" y="240" width="96" height="96" fill="#FFFFFF" rx="10"/>
+            <circle cx="44" cy="260" r="14" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+            <circle cx="100" cy="260" r="14" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+            <circle cx="44" cy="316" r="14" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+            <circle cx="100" cy="316" r="14" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+
+            <!-- Blue Quadrant (Bottom-Right) -->
+            <rect x="216" y="216" width="144" height="144" fill="#3B82F6" rx="8"/>
+            <rect x="240" y="240" width="96" height="96" fill="#FFFFFF" rx="10"/>
+            <circle cx="260" cy="260" r="14" fill="#DBEAFE" stroke="#3B82F6" stroke-width="1.5"/>
+            <circle cx="316" cy="260" r="14" fill="#DBEAFE" stroke="#3B82F6" stroke-width="1.5"/>
+            <circle cx="260" cy="316" r="14" fill="#DBEAFE" stroke="#3B82F6" stroke-width="1.5"/>
+            <circle cx="316" cy="316" r="14" fill="#DBEAFE" stroke="#3B82F6" stroke-width="1.5"/>
+
+            <!-- Corridors & Safe Star Cells -->
+            <g id="track-cells"></g>
+
+            <!-- Center Finishing Triangles -->
+            <polygon points="144,144 216,144 180,180" fill="#F59E0B" stroke="#FFFFFF" stroke-width="1.5"/>
+            <polygon points="216,144 216,216 180,180" fill="#3B82F6" stroke="#FFFFFF" stroke-width="1.5"/>
+            <polygon points="144,216 216,216 180,180" fill="#EF4444" stroke="#FFFFFF" stroke-width="1.5"/>
+            <polygon points="144,144 144,216 180,180" fill="#10B981" stroke="#FFFFFF" stroke-width="1.5"/>
+            <circle cx="180" cy="180" r="10" fill="#FFFFFF" stroke="#E2E4F0" stroke-width="1"/>
+          </svg>
+
+          <!-- Interactive Tokens Layer -->
+          <div class="tokens-overlay" id="tokens-layer"></div>
+        </div>
+      </div>
+
+      <!-- Controls HUD -->
+      <div class="gameplay-bottom-hud">
+        <div class="hud-player-profile">
+          <div class="hud-avatar-circle" id="hud-avatar">1</div>
+          <div class="hud-player-text">
+            <h4 id="hud-player-name">Player 1</h4>
+            <p id="hud-player-team">RED TEAM</p>
+          </div>
+        </div>
+
+        <div class="dice-hud-action" onclick="onDiceClick()">
+          <div class="dice-cube-frame" id="hud-dice">
+            <div class="dice-cube-face" id="hud-dice-face">🎲</div>
+          </div>
+          <span class="dice-cube-hint" id="hud-dice-tip">TAP TO ROLL</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Home Indicator Bar -->
+    <div class="home-indicator-bar"></div>
+  </div>
+
+  <script>
+    const BACKEND_URL = window.location.origin;
+    const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+
+    const SAFE_TILES = new Set([0, 8, 13, 21, 26, 34, 39, 47]);
+    const COLOR_START_INDEX = { red: 0, green: 13, yellow: 26, blue: 39 };
+    const COLORS_CONFIG = {
+      red: { hex: '#EF4444', light: '#FEE2E2', name: 'RED' },
+      green: { hex: '#10B981', light: '#D1FAE5', name: 'GREEN' },
+      yellow: { hex: '#F59E0B', light: '#FEF3C7', name: 'YELLOW' },
+      blue: { hex: '#3B82F6', light: '#DBEAFE', name: 'BLUE' }
+    };
+
+    const TRACK_COORDS = [
+      [6, 13], [6, 12], [6, 11], [6, 10], [6, 9],
+      [5, 8], [4, 8], [3, 8], [2, 8], [1, 8], [0, 8],
+      [0, 7], [0, 6],
+      [1, 6], [2, 6], [3, 6], [4, 6], [5, 6],
+      [6, 5], [6, 4], [6, 3], [6, 2], [6, 1], [6, 0],
+      [7, 0], [8, 0],
+      [8, 1], [8, 2], [8, 3], [8, 4], [8, 5],
+      [9, 6], [10, 6], [11, 6], [12, 6], [13, 6], [14, 6],
+      [14, 7], [14, 8],
+      [13, 8], [12, 8], [11, 8], [10, 8], [9, 8],
+      [8, 9], [8, 10], [8, 11], [8, 12], [8, 13], [8, 14],
+      [7, 14], [6, 14]
+    ];
+
+    let offlineCount = 2;
+    let createCapacity = 4;
+    let isOnlineGame = false;
+    let onlineRoomData = null;
+    let currentUser = null;
+    let currentAuthToken = null;
+    let activeSocket = null;
+
+    let gameState = null;
+    let isRolling = false;
+
+    function navigateToScreen(screenId) {
+      document.querySelectorAll('.screen-view').forEach(el => el.style.display = 'none');
+      const target = document.getElementById(screenId);
+      if (target) target.style.display = 'flex';
+    }
+
+    function drawGridCells() {
+      const g = document.getElementById('track-cells');
+      let svgHtml = '';
+      for (let c = 6; c <= 8; c++) {
+        for (let r = 0; r <= 5; r++) {
+          let fill = (c === 7 && r >= 1) ? '#F59E0B' : ((c === 8 && r === 1) ? '#FEF3C7' : '#FFFFFF');
+          svgHtml += `<rect x="${c * 24}" y="${r * 24}" width="24" height="24" fill="${fill}" stroke="#E2E4F0" stroke-width="1"/>`;
+        }
+      }
+      for (let c = 6; c <= 8; c++) {
+        for (let r = 9; r <= 14; r++) {
+          let fill = (c === 7 && r <= 13) ? '#EF4444' : ((c === 6 && r === 13) ? '#FEE2E2' : '#FFFFFF');
+          svgHtml += `<rect x="${c * 24}" y="${r * 24}" width="24" height="24" fill="${fill}" stroke="#E2E4F0" stroke-width="1"/>`;
+        }
+      }
+      for (let c = 0; c <= 5; c++) {
+        for (let r = 6; r <= 8; r++) {
+          let fill = (r === 7 && c >= 1) ? '#10B981' : ((r === 6 && c === 1) ? '#D1FAE5' : '#FFFFFF');
+          svgHtml += `<rect x="${c * 24}" y="${r * 24}" width="24" height="24" fill="${fill}" stroke="#E2E4F0" stroke-width="1"/>`;
+        }
+      }
+      for (let c = 9; c <= 14; c++) {
+        for (let r = 6; r <= 8; r++) {
+          let fill = (r === 7 && c <= 13) ? '#3B82F6' : ((r === 8 && c === 13) ? '#DBEAFE' : '#FFFFFF');
+          svgHtml += `<rect x="${c * 24}" y="${r * 24}" width="24" height="24" fill="${fill}" stroke="#E2E4F0" stroke-width="1"/>`;
+        }
+      }
+      const stars = [[6, 13], [8, 12], [1, 6], [2, 8], [8, 1], [6, 2], [13, 8], [12, 6]];
+      stars.forEach(([c, r]) => {
+        const cx = (c + 0.5) * 24;
+        const cy = (r + 0.5) * 24;
+        svgHtml += `<circle cx="${cx}" cy="${cy}" r="9" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
+                    <text x="${cx}" y="${cy + 4}" font-size="12" fill="#F59E0B" font-weight="bold" text-anchor="middle">★</text>`;
+      });
+      g.innerHTML = svgHtml;
+    }
+    drawGridCells();
+
+    function setOfflineCount(cnt, el) {
+      offlineCount = cnt;
+      document.querySelectorAll('#screen-home .segment-tab').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function startOfflineGame() {
+      isOnlineGame = false;
+      const colors = offlineCount === 2 ? ['red', 'yellow'] : (offlineCount === 3 ? ['red', 'green', 'yellow'] : ['red', 'green', 'yellow', 'blue']);
+      gameState = {
+        players: colors.map((col, idx) => ({
+          id: idx,
+          name: `Player ${idx + 1}`,
+          color: col,
+          tokens: [0, 1, 2, 3].map(tId => ({ id: tId, color: col, position: -1, steps: -1 }))
+        })),
+        currentTurnIndex: 0,
+        diceValue: null,
+        diceRolled: false,
+        legalTokens: [],
+        status: 'awaiting_roll'
+      };
+      document.getElementById('game-mode-label').textContent = 'OFFLINE';
+      navigateToScreen('screen-game');
+      renderHUD();
+      renderTokens();
+    }
+
+    function setCreateCapacity(cap, el) {
+      createCapacity = cap;
+      document.querySelectorAll('#screen-create-room .segment-tab').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    async function executeCreateRoomBackend() {
+      const username = document.getElementById('online-player-name').value.trim() || 'Host';
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/rooms`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ capacity: createCapacity, username })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        onlineRoomData = data.room;
+        currentUser = data.user;
+        currentAuthToken = data.token;
+        initWebSocket(onlineRoomData.code, currentAuthToken);
+        renderLobbyUI();
+        navigateToScreen('screen-lobby');
+      } catch (e) {
+        alert('Create Room Error: ' + e.message);
+      }
+    }
+
+    async function executeJoinRoomBackend() {
+      const code = document.getElementById('join-room-code-input').value.trim().toUpperCase();
+      const username = document.getElementById('online-player-name').value.trim() || 'Player';
+      const errEl = document.getElementById('join-error-box');
+      errEl.style.display = 'none';
+
+      if (!code) {
+        errEl.textContent = 'Please enter a valid room code';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/rooms/${code}/join`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to join');
+
+        onlineRoomData = data.room;
+        currentUser = data.user;
+        currentAuthToken = data.token;
+        initWebSocket(onlineRoomData.code, currentAuthToken);
+        renderLobbyUI();
+        navigateToScreen('screen-lobby');
+      } catch (e) {
+        errEl.textContent = e.message;
+        errEl.style.display = 'block';
+      }
+    }
+
+    async function executeQuickMatchBackend(capacity) {
+      const username = document.getElementById('online-player-name').value.trim() || 'Player';
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/matchmaking/join`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ capacity, username })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        onlineRoomData = data.room;
+        currentUser = data.user;
+        currentAuthToken = data.token;
+        initWebSocket(onlineRoomData.code, currentAuthToken);
+
+        if (onlineRoomData.status === 'in_game') {
+          launchOnlineGameplay();
+        } else {
+          renderLobbyUI();
+          navigateToScreen('screen-lobby');
+        }
+      } catch (e) {
+        alert('Matchmaking error: ' + e.message);
+      }
+    }
+
+    function initWebSocket(code, token) {
+      if (activeSocket) activeSocket.close();
+      activeSocket = new WebSocket(`${WS_URL}?room=${code}&token=${token}`);
+
+      activeSocket.onmessage = (event) => {
+        try {
+          const { event: evName, payload } = JSON.parse(event.data);
+          if (evName === 'room.updated' || evName === 'room.player_joined' || evName === 'room.player_left') {
+            onlineRoomData = payload;
+            renderLobbyUI();
+          } else if (evName === 'game.started') {
+            onlineRoomData = payload;
+            launchOnlineGameplay();
+          } else if (evName === 'game.dice_result' || evName === 'game.token_moved' || evName === 'game.turn_changed') {
+            onlineRoomData = payload.room || payload;
+            syncOnlineGameState();
+          } else if (evName === 'game.player_won') {
+            onlineRoomData = payload.room;
+            alert(`🎉 Congratulations! Winner: ${payload.winner_id}`);
+            navigateToScreen('screen-home');
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      };
+    }
+
+    function renderLobbyUI() {
+      if (!onlineRoomData) return;
+      document.getElementById('lobby-code-display').textContent = onlineRoomData.code;
+      const pArr = Object.values(onlineRoomData.players);
+      document.getElementById('lobby-count').textContent = pArr.length;
+      document.getElementById('lobby-capacity').textContent = onlineRoomData.capacity;
+
+      const list = document.getElementById('lobby-players-list');
+      let html = '';
+      for (let i = 0; i < onlineRoomData.capacity; i++) {
+        const p = pArr[i];
+        if (p) {
+          const colorHex = COLORS_CONFIG[p.color].hex;
+          html += `
+            <div style="display: flex; align-items: center; background: #FFFFFF; padding: 12px; border-radius: 14px; border: 1px solid var(--border-subtle); box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+              <div style="width: 36px; height: 36px; border-radius: 18px; background: ${colorHex}; color: #FFF; display: flex; align-items: center; justify-content: center; font-weight: 900; margin-right: 12px;">${p.username.charAt(0).toUpperCase()}</div>
+              <div style="flex: 1;">
+                <div style="font-size: 14px; font-weight: 800; color: var(--text-dark);">${p.username} ${p.user_id === onlineRoomData.host_id ? '👑 (Host)' : ''}</div>
+                <div style="font-size: 10px; font-weight: 700; color: ${colorHex}; margin-top: 1px;">${p.color.toUpperCase()} TEAM</div>
+              </div>
+              <div style="font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: ${p.is_ready ? '#D1FAE5' : '#FEE2E2'}; color: ${p.is_ready ? '#047857' : '#B91C1C'};">${p.is_ready ? 'READY' : 'WAITING'}</div>
+            </div>`;
+        } else {
+          html += `<div style="padding: 14px; border-radius: 14px; border: 1px dashed var(--border-subtle); text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600;">+ Waiting for Player...</div>`;
+        }
+      }
+      list.innerHTML = html;
+
+      const isHost = onlineRoomData.host_id === currentUser?.id;
+      const allReady = pArr.length >= 2 && pArr.every(p => p.is_ready);
+      const startBtn = document.getElementById('btn-start-online');
+      startBtn.style.display = isHost ? 'block' : 'none';
+      startBtn.style.opacity = allReady ? '1' : '0.5';
+      startBtn.disabled = !allReady;
+    }
+
+    function toggleLobbyReady() {
+      if (activeSocket) activeSocket.send(JSON.stringify({ event: 'room.ready', payload: {} }));
+    }
+
+    function hostStartOnlineGame() {
+      if (activeSocket) activeSocket.send(JSON.stringify({ event: 'game.start', payload: {} }));
+    }
+
+    function copyShareCode() {
+      if (onlineRoomData) {
+        navigator.clipboard?.writeText(onlineRoomData.code);
+        alert(`Room Code ${onlineRoomData.code} copied!`);
+      }
+    }
+
+    function leaveOnlineLobby() {
+      if (activeSocket) activeSocket.close();
+      navigateToScreen('screen-online-mode');
+    }
+
+    function launchOnlineGameplay() {
+      isOnlineGame = true;
+      document.getElementById('game-mode-label').textContent = `ROOM: ${onlineRoomData.code}`;
+      syncOnlineGameState();
+      navigateToScreen('screen-game');
+    }
+
+    function syncOnlineGameState() {
+      if (!onlineRoomData) return;
+      const pArr = Object.values(onlineRoomData.players);
+      gameState = {
+        players: pArr.map(p => ({
+          id: p.user_id,
+          name: p.username,
+          color: p.color,
+          tokens: p.tokens
+        })),
+        currentTurnIndex: onlineRoomData.current_turn_index,
+        diceValue: onlineRoomData.dice_value,
+        diceRolled: onlineRoomData.dice_rolled,
+        legalTokens: onlineRoomData.legal_tokens || [],
+        status: onlineRoomData.dice_rolled ? 'awaiting_move' : 'awaiting_roll'
+      };
+      renderHUD();
+      renderTokens();
+    }
+
+    function exitGameplay() {
+      if (isOnlineGame && activeSocket) {
+        activeSocket.close();
+      }
+      navigateToScreen('screen-home');
+    }
+
+    function renderHUD() {
+      const p = gameState.players[gameState.currentTurnIndex];
+      const cfg = COLORS_CONFIG[p.color];
+
+      document.getElementById('hud-avatar').style.backgroundColor = cfg.hex;
+      document.getElementById('hud-avatar').textContent = p.name.charAt(0).toUpperCase();
+      document.getElementById('hud-player-name').textContent = p.name;
+      document.getElementById('hud-player-team').textContent = `${cfg.name} TEAM`;
+      document.getElementById('hud-player-team').style.color = cfg.hex;
+
+      const diceBox = document.getElementById('hud-dice');
+      diceBox.style.borderColor = cfg.hex;
+      document.getElementById('turn-dot-color').style.backgroundColor = cfg.hex;
+
+      const isMyTurn = isOnlineGame ? (p.id === currentUser?.id) : true;
+
+      if (!gameState.diceRolled) {
+        document.getElementById('hud-dice-tip').textContent = isMyTurn ? 'TAP TO ROLL' : 'WAITING...';
+        document.getElementById('banner-text').textContent = `${p.name}'s Turn — ${isMyTurn ? 'Tap Dice' : 'Waiting for roll'}`;
+        document.getElementById('hud-dice-face').textContent = '🎲';
+      } else {
+        document.getElementById('hud-dice-tip').textContent = isMyTurn ? 'SELECT TOKEN' : 'MOVING...';
+        document.getElementById('banner-text').textContent = `${p.name} rolled a ${gameState.diceValue}!`;
+        document.getElementById('hud-dice-face').textContent = gameState.diceValue;
+      }
+    }
+
+    function onDiceClick() {
+      if (isOnlineGame) {
+        const currentP = gameState.players[gameState.currentTurnIndex];
+        if (currentP.id === currentUser?.id && !gameState.diceRolled) {
+          activeSocket.send(JSON.stringify({ event: 'game.roll_dice', payload: {} }));
+        }
+        return;
+      }
+
+      if (gameState.status !== 'awaiting_roll' || isRolling) return;
+      isRolling = true;
+      const dice = document.getElementById('hud-dice');
+      dice.classList.add('is-rolling');
+
+      setTimeout(() => {
+        dice.classList.remove('is-rolling');
+        isRolling = false;
+        const val = Math.floor(Math.random() * 6) + 1;
+        gameState.diceValue = val;
+        gameState.diceRolled = true;
+        document.getElementById('hud-dice-face').textContent = val;
+
+        const p = gameState.players[gameState.currentTurnIndex];
+        const legal = [];
+        p.tokens.forEach(tok => {
+          if (tok.position === 999) return;
+          if (tok.position === -1) {
+            if (val === 6) legal.push(tok.id);
+          } else if (tok.steps + val <= 56) {
+            legal.push(tok.id);
+          }
+        });
+        gameState.legalTokens = legal;
+        gameState.status = 'awaiting_move';
+
+        if (legal.length === 0) {
+          document.getElementById('banner-text').textContent = `${p.name} rolled a ${val} (no moves)`;
+          setTimeout(() => advanceTurn(false), 1200);
+        } else {
+          renderHUD();
+          renderTokens();
+        }
+      }, 500);
+    }
+
+    function onTokenPress(pIdx, tId) {
+      if (isOnlineGame) {
+        const currentP = gameState.players[gameState.currentTurnIndex];
+        if (currentP.id === currentUser?.id && gameState.legalTokens.includes(tId)) {
+          activeSocket.send(JSON.stringify({ event: 'game.move_token', payload: { token_id: tId } }));
+        }
+        return;
+      }
+
+      if (gameState.status !== 'awaiting_move') return;
+      if (pIdx !== gameState.currentTurnIndex) return;
+      if (!gameState.legalTokens.includes(tId)) return;
+
+      const p = gameState.players[pIdx];
+      const tok = p.tokens[tId];
+      const val = gameState.diceValue;
+      let captured = false;
+
+      if (tok.position === -1) {
+        tok.position = COLOR_START_INDEX[tok.color];
+        tok.steps = 0;
+      } else {
+        tok.steps += val;
+        if (tok.steps === 56) {
+          tok.position = 999;
+          if (p.tokens.every(t => t.position === 999)) {
+            alert(`🎉 ${p.name} won!`);
+            exitGameplay();
+            return;
+          }
+        } else if (tok.steps > 50) {
+          tok.position = 100 + (tok.steps - 51);
+        } else {
+          tok.position = (COLOR_START_INDEX[tok.color] + tok.steps) % 52;
+          if (!SAFE_TILES.has(tok.position)) {
+            gameState.players.forEach(op => {
+              if (op.id === pIdx) return;
+              op.tokens.forEach(ot => {
+                if (ot.position === tok.position) {
+                  ot.position = -1;
+                  ot.steps = -1;
+                  captured = true;
+                }
+              });
+            });
+          }
+        }
+      }
+
+      renderTokens();
+      const extraTurn = (val === 6 || captured);
+      setTimeout(() => advanceTurn(extraTurn), 600);
+    }
+
+    function advanceTurn(extraTurn) {
+      if (!extraTurn) {
+        gameState.currentTurnIndex = (gameState.currentTurnIndex + 1) % gameState.players.length;
+      }
+      gameState.diceValue = null;
+      gameState.diceRolled = false;
+      gameState.legalTokens = [];
+      gameState.status = 'awaiting_roll';
+      renderHUD();
+      renderTokens();
+    }
+
+    function getTokenPixelCoords(color, tok) {
+      const cell = 340 / 15;
+
+      if (tok.position === -1) {
+        const wellPositions = {
+          green: [[1.8, 1.8], [4.2, 1.8], [1.8, 4.2], [4.2, 4.2]],
+          yellow: [[10.8, 1.8], [13.2, 1.8], [10.8, 4.2], [13.2, 4.2]],
+          red: [[1.8, 10.8], [4.2, 10.8], [1.8, 13.2], [4.2, 13.2]],
+          blue: [[10.8, 10.8], [13.2, 10.8], [10.8, 13.2], [13.2, 13.2]],
+        };
+        const [gx, gy] = wellPositions[color][tok.id];
+        return { x: gx * cell, y: gy * cell };
+      }
+      if (tok.position === 999) {
+        const goalOffsets = { red: [7.5, 8.0], green: [7.0, 7.5], yellow: [7.5, 7.0], blue: [8.0, 7.5] };
+        const [gx, gy] = goalOffsets[color];
+        return { x: gx * cell, y: gy * cell };
+      }
+      if (tok.position >= 100) {
+        const step = tok.position - 100 + 1;
+        let c = 7, r = 7;
+        if (color === 'red') { c = 7; r = 14 - step; }
+        else if (color === 'green') { c = step; r = 7; }
+        else if (color === 'yellow') { c = 7; r = step; }
+        else if (color === 'blue') { c = 14 - step; r = 7; }
+        return { x: (c + 0.5) * cell, y: (r + 0.5) * cell };
+      }
+      const [c, r] = TRACK_COORDS[tok.position];
+      return { x: (c + 0.5) * cell, y: (r + 0.5) * cell };
+    }
+
+    function renderTokens() {
+      const layer = document.getElementById('tokens-layer');
+      layer.innerHTML = '';
+      if (!gameState) return;
+
+      const activePlayer = gameState.players[gameState.currentTurnIndex];
+      const activeColor = activePlayer.color;
+
+      gameState.players.forEach((p, pIdx) => {
+        p.tokens.forEach(tok => {
+          const coords = getTokenPixelCoords(p.color, tok);
+          const isLegal = p.color === activeColor && gameState.legalTokens.includes(tok.id);
+
+          const el = document.createElement('div');
+          el.className = `token-item ${isLegal ? 'highlight-legal' : ''}`;
+          el.style.left = `${coords.x}px`;
+          el.style.top = `${coords.y}px`;
+          el.style.backgroundColor = COLORS_CONFIG[p.color].hex;
+
+          const dot = document.createElement('div');
+          dot.className = 'inner-dot';
+          el.appendChild(dot);
+
+          el.onclick = () => onTokenPress(pIdx, tok.id);
+          layer.appendChild(el);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
