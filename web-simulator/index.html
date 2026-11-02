@@ -868,6 +868,7 @@
     let currentUser = null;
     let currentAuthToken = null;
     let activeSocket = null;
+    let pollInterval = null;
 
     let gameState = null;
     let isRolling = false;
@@ -1068,6 +1069,44 @@
       } catch (err) {
         console.warn('WebSocket initialization note:', err);
       }
+
+      // Start automatic realtime state synchronization
+      startRoomPolling(code);
+    }
+
+    function startRoomPolling(code) {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(async () => {
+        if (!onlineRoomData || onlineRoomData.code !== code) return;
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/rooms/${code}`);
+          if (res.ok) {
+            const latestRoom = await res.json();
+            const prevStatus = onlineRoomData.status;
+            const prevVersion = onlineRoomData.version;
+            onlineRoomData = latestRoom;
+
+            const inLobby = document.getElementById('screen-lobby').style.display === 'flex';
+            const inGame = document.getElementById('screen-game').style.display === 'flex';
+
+            if (inLobby) {
+              renderLobbyUI();
+              if (latestRoom.status === 'in_game' && prevStatus !== 'in_game') {
+                launchOnlineGameplay();
+              }
+            } else if (inGame) {
+              if (latestRoom.version !== prevVersion) {
+                syncOnlineGameState();
+              }
+              if (latestRoom.status === 'finished' && latestRoom.winner_id) {
+                clearInterval(pollInterval);
+                alert(`🎉 Congratulations! Winner: ${latestRoom.winner_id}`);
+                navigateToScreen('screen-home');
+              }
+            }
+          }
+        } catch (e) {}
+      }, 800);
     }
 
     function renderLobbyUI() {
@@ -1106,12 +1145,46 @@
       startBtn.disabled = !allReady;
     }
 
-    function toggleLobbyReady() {
-      if (activeSocket) activeSocket.send(JSON.stringify({ event: 'room.ready', payload: {} }));
+    async function toggleLobbyReady() {
+      if (activeSocket && activeSocket.readyState === WebSocket.OPEN) {
+        activeSocket.send(JSON.stringify({ event: 'room.ready', payload: {} }));
+      }
+      if (onlineRoomData) {
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/rooms/${onlineRoomData.code}/ready`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${currentAuthToken}`
+            }
+          });
+          if (res.ok) {
+            onlineRoomData = await res.json();
+            renderLobbyUI();
+          }
+        } catch(e) {}
+      }
     }
 
-    function hostStartOnlineGame() {
-      if (activeSocket) activeSocket.send(JSON.stringify({ event: 'game.start', payload: {} }));
+    async function hostStartOnlineGame() {
+      if (activeSocket && activeSocket.readyState === WebSocket.OPEN) {
+        activeSocket.send(JSON.stringify({ event: 'game.start', payload: {} }));
+      }
+      if (onlineRoomData) {
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/rooms/${onlineRoomData.code}/start`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${currentAuthToken}`
+            }
+          });
+          if (res.ok) {
+            onlineRoomData = await res.json();
+            launchOnlineGameplay();
+          }
+        } catch(e) {}
+      }
     }
 
     function copyShareCode() {
@@ -1122,6 +1195,7 @@
     }
 
     function leaveOnlineLobby() {
+      if (pollInterval) clearInterval(pollInterval);
       if (activeSocket) activeSocket.close();
       navigateToScreen('screen-online-mode');
     }
@@ -1154,6 +1228,7 @@
     }
 
     function exitGameplay() {
+      if (pollInterval) clearInterval(pollInterval);
       if (isOnlineGame && activeSocket) {
         activeSocket.close();
       }
@@ -1187,11 +1262,28 @@
       }
     }
 
-    function onDiceClick() {
+    async function onDiceClick() {
       if (isOnlineGame) {
         const currentP = gameState.players[gameState.currentTurnIndex];
         if (currentP.id === currentUser?.id && !gameState.diceRolled) {
-          activeSocket.send(JSON.stringify({ event: 'game.roll_dice', payload: {} }));
+          if (activeSocket && activeSocket.readyState === WebSocket.OPEN) {
+            activeSocket.send(JSON.stringify({ event: 'game.roll_dice', payload: {} }));
+          }
+          if (onlineRoomData) {
+            try {
+              const res = await fetch(`${BACKEND_URL}/api/rooms/${onlineRoomData.code}/roll`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${currentAuthToken}`
+                }
+              });
+              if (res.ok) {
+                onlineRoomData = await res.json();
+                syncOnlineGameState();
+              }
+            } catch(e) {}
+          }
         }
         return;
       }
@@ -1232,11 +1324,29 @@
       }, 500);
     }
 
-    function onTokenPress(pIdx, tId) {
+    async function onTokenPress(pIdx, tId) {
       if (isOnlineGame) {
         const currentP = gameState.players[gameState.currentTurnIndex];
         if (currentP.id === currentUser?.id && gameState.legalTokens.includes(tId)) {
-          activeSocket.send(JSON.stringify({ event: 'game.move_token', payload: { token_id: tId } }));
+          if (activeSocket && activeSocket.readyState === WebSocket.OPEN) {
+            activeSocket.send(JSON.stringify({ event: 'game.move_token', payload: { token_id: tId } }));
+          }
+          if (onlineRoomData) {
+            try {
+              const res = await fetch(`${BACKEND_URL}/api/rooms/${onlineRoomData.code}/move`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${currentAuthToken}`
+                },
+                body: JSON.stringify({ token_id: tId })
+              });
+              if (res.ok) {
+                onlineRoomData = await res.json();
+                syncOnlineGameState();
+              }
+            } catch(e) {}
+          }
         }
         return;
       }

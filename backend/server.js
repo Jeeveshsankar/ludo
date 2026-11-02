@@ -455,6 +455,108 @@ function handleHttpRequest(req, res) {
       return;
     }
 
+    // START GAME (HTTP Fallback)
+    if (pathname.match(/^\/api\/rooms\/[^\/]+\/start$/) && req.method === 'POST') {
+      const code = pathname.split('/')[3]?.toUpperCase();
+      const room = roomsByCode.get(code);
+      if (!room) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Room not found' }));
+        return;
+      }
+      const user = getOrCreateUser(req.headers['authorization']);
+      if (room.host_id === user.id && Object.keys(room.players).length >= 2) {
+        room.status = 'in_game';
+        room.current_turn_index = 0;
+        room.dice_value = null;
+        room.dice_rolled = false;
+        room.version++;
+        broadcastToRoom(code, 'game.started', room);
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(room));
+      return;
+    }
+
+    // ROLL DICE (HTTP Fallback)
+    if (pathname.match(/^\/api\/rooms\/[^\/]+\/roll$/) && req.method === 'POST') {
+      const code = pathname.split('/')[3]?.toUpperCase();
+      const room = roomsByCode.get(code);
+      if (!room) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Room not found' }));
+        return;
+      }
+      const user = getOrCreateUser(req.headers['authorization']);
+      const currentUid = room.turn_order[room.current_turn_index];
+      if (currentUid === user.id && !room.dice_rolled && room.status === 'in_game') {
+        const val = crypto.randomInt(1, 7);
+        room.dice_value = val;
+        room.dice_rolled = true;
+        if (val === 6) room.consecutive_sixes++;
+        else room.consecutive_sixes = 0;
+
+        if (room.consecutive_sixes === 3) {
+          room.consecutive_sixes = 0;
+          room.dice_rolled = false;
+          room.legal_tokens = [];
+          room.current_turn_index = (room.current_turn_index + 1) % room.turn_order.length;
+          room.version++;
+        } else {
+          const p = room.players[user.id];
+          const legal = calculateLegalMoves(p, val);
+          room.legal_tokens = legal;
+          room.version++;
+          if (legal.length === 0) {
+            setTimeout(() => {
+              room.dice_rolled = false;
+              room.legal_tokens = [];
+              room.current_turn_index = (room.current_turn_index + 1) % room.turn_order.length;
+              room.version++;
+            }, 1200);
+          }
+        }
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(room));
+      return;
+    }
+
+    // MOVE TOKEN (HTTP Fallback)
+    if (pathname.match(/^\/api\/rooms\/[^\/]+\/move$/) && req.method === 'POST') {
+      const code = pathname.split('/')[3]?.toUpperCase();
+      const room = roomsByCode.get(code);
+      if (!room) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Room not found' }));
+        return;
+      }
+      const user = getOrCreateUser(req.headers['authorization']);
+      const tokenId = jsonBody.token_id;
+      const currentUid = room.turn_order[room.current_turn_index];
+      if (currentUid === user.id && room.dice_rolled && room.status === 'in_game') {
+        if (room.legal_tokens.includes(tokenId)) {
+          const p = room.players[user.id];
+          const { captured, finished } = executeMove(room, p, tokenId, room.dice_value);
+          room.version++;
+          if (p.finished) {
+            room.winner_id = user.id;
+            room.status = 'finished';
+          } else {
+            const grantExtraTurn = room.dice_value === 6 || captured;
+            room.dice_rolled = false;
+            room.legal_tokens = [];
+            if (!grantExtraTurn) {
+              room.current_turn_index = (room.current_turn_index + 1) % room.turn_order.length;
+            }
+          }
+        }
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(room));
+      return;
+    }
+
     // QUICK MATCH (Matchmaking)
     if (pathname === '/api/matchmaking/join' && req.method === 'POST') {
       const user = getOrCreateUser(req.headers['authorization'], jsonBody.username || 'MatchPlayer');
