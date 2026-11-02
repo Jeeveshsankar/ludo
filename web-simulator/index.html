@@ -286,32 +286,21 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px 12px;
-      perspective: 900px;
+      padding: 4px 8px;
     }
     .ludo-board-card {
       width: 340px;
       height: 340px;
       background: #FFFFFF;
-      border-radius: 24px;
+      border-radius: 18px;
       position: relative;
-      box-shadow: 
-        0 14px 28px rgba(15, 23, 42, 0.16),
-        0 4px 10px rgba(15, 23, 42, 0.08),
-        inset 0 2px 4px rgba(255, 255, 255, 0.8),
-        inset 0 -4px 8px rgba(0, 0, 0, 0.06);
-      border: 4px solid #F1F5F9;
-      transform: rotateX(12deg) scale(0.98);
-      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 8px 30px rgba(124, 58, 237, 0.08);
+      border: 1.5px solid var(--border-subtle);
       overflow: hidden;
-    }
-    .ludo-board-card:hover {
-      transform: rotateX(6deg) scale(1);
     }
     .ludo-board-card svg {
       width: 100%;
       height: 100%;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.04));
     }
 
     .tokens-overlay {
@@ -322,10 +311,11 @@
       height: 100%;
       pointer-events: none;
     }
+    /* Realistic Ludo Coin Token */
     .token-item {
       position: absolute;
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       transform: translate(-50%, -50%);
       pointer-events: auto;
@@ -333,56 +323,55 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid rgba(255, 255, 255, 0.95);
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
       box-shadow: 
-        0 6px 12px rgba(0, 0, 0, 0.28),
-        0 2px 4px rgba(0, 0, 0, 0.18),
-        inset 0 3px 6px rgba(255, 255, 255, 0.6),
-        inset 0 -3px 6px rgba(0, 0, 0, 0.35);
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        0 3px 5px rgba(0, 0, 0, 0.35),
+        inset 0 2px 3px rgba(255, 255, 255, 0.6),
+        inset 0 -2px 3px rgba(0, 0, 0, 0.35);
+      transition: left 0.24s cubic-bezier(0.25, 1, 0.5, 1), top 0.24s cubic-bezier(0.25, 1, 0.5, 1);
       z-index: 20;
     }
-    .token-item::after {
+    .token-item::before {
       content: '';
       position: absolute;
-      top: 3px;
-      left: 5px;
-      width: 6px;
-      height: 3px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.8);
-      transform: rotate(-30deg);
+      border: 1px dashed rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.12);
+      pointer-events: none;
     }
     .token-item.highlight-legal {
-      animation: token-glow-pulse 0.6s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 30;
+      border: 2px solid #FFFFFF;
+      animation: realistic-token-pulse 0.65s infinite alternate ease-in-out;
+      z-index: 35;
       cursor: pointer;
     }
-    @keyframes token-glow-pulse {
-      0% { 
-        transform: translate(-50%, -50%) translateY(0px) scale(1.05); 
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 10px rgba(245, 158, 11, 0.6);
+    @keyframes realistic-token-pulse {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.35), 0 0 6px rgba(245, 158, 11, 0.8);
       }
-      100% { 
-        transform: translate(-50%, -50%) translateY(-6px) scale(1.26); 
-        box-shadow: 0 12px 18px rgba(0, 0, 0, 0.35), 0 0 18px rgba(245, 158, 11, 0.95);
+      100% {
+        transform: translate(-50%, -50%) scale(1.18);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 0 14px rgba(245, 158, 11, 1);
       }
     }
     .token-item .inner-dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: #FFFFFF;
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     }
 
     /* Gameplay Bottom HUD */
     .gameplay-bottom-hud {
-      background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
-      border-top: 1px solid rgba(226, 232, 240, 0.9);
-      padding: 12px 20px 24px;
-      border-radius: 28px 28px 0 0;
-      box-shadow: 0 -8px 25px rgba(15, 23, 42, 0.05);
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-subtle);
+      padding: 10px 16px 20px;
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.03);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -390,70 +379,62 @@
     .hud-player-profile {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
     .hud-avatar-circle {
-      width: 46px;
-      height: 46px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       background: var(--color-red);
-      border: 3px solid #FFFFFF;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16), inset 0 2px 4px rgba(255, 255, 255, 0.5);
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #FFFFFF;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 900;
     }
     .hud-player-text h4 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       color: var(--text-dark);
     }
     .hud-player-text p {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 800;
       color: var(--color-red);
       letter-spacing: 0.5px;
       margin-top: 1px;
     }
 
-    /* 3D Realistic Dice */
+    /* Dice */
     .dice-hud-action {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       cursor: pointer;
     }
     .dice-cube-frame {
-      width: 58px;
-      height: 58px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%);
-      border: 3px solid var(--color-red);
-      box-shadow: 
-        0 8px 16px rgba(0, 0, 0, 0.15),
-        0 2px 4px rgba(0, 0, 0, 0.1),
-        inset 0 2px 4px rgba(255, 255, 255, 0.9),
-        inset 0 -3px 6px rgba(0, 0, 0, 0.08);
+      width: 54px;
+      height: 54px;
+      border-radius: 15px;
+      background: #FFFFFF;
+      border: 2.5px solid var(--color-red);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
       padding: 3px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .dice-cube-frame:active {
-      transform: scale(0.92);
+      transition: transform 0.2s;
     }
     .dice-cube-frame.is-rolling {
-      animation: dice-3d-roll 0.4s infinite ease-in-out;
+      animation: dice-cube-spin 0.35s infinite linear;
     }
-    @keyframes dice-3d-roll {
-      0% { transform: translateY(-8px) rotateX(0deg) rotateY(0deg) scale(1.15); box-shadow: 0 16px 24px rgba(0,0,0,0.25); }
-      50% { transform: translateY(-14px) rotateX(180deg) rotateY(90deg) scale(1.22); box-shadow: 0 22px 30px rgba(0,0,0,0.3); }
-      100% { transform: translateY(-8px) rotateX(360deg) rotateY(180deg) scale(1.15); box-shadow: 0 16px 24px rgba(0,0,0,0.25); }
+    @keyframes dice-cube-spin {
+      0% { transform: rotate(0deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(1.1); }
     }
     .dice-cube-face {
       width: 100%;
@@ -463,16 +444,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 900;
       color: var(--text-dark);
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
     }
     .dice-cube-hint {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 800;
       color: var(--text-muted);
-      letter-spacing: 0.6px;
+      letter-spacing: 0.5px;
     }
 
     .home-indicator-bar {
@@ -1363,25 +1343,42 @@
     }
 
     function getTokenPixelCoords(color, tok) {
-      const cell = 340 / 15;
+      // Board SVG viewBox is 360x360 with a standard 15x15 Ludo grid
+      // Board inner playable dimension: 340px, cell size: 340 / 15
+      const boardWidth = 340;
+      const cell = boardWidth / 15; // 22.666px
 
+      // BASE QUADRANTS: Exact geometric centers of the white circle token wells
+      // Quad origins: Green (0,0), Yellow (216,0), Red (0,216), Blue (216,216)
+      // SVG Circles:
+      // Green: (44,44), (100,44), (44,100), (100,100) -> scaled to 340/360:
+      const scale = boardWidth / 360; // 340 / 360 = 0.94444
       if (tok.position === -1) {
-        const wellPositions = {
-          green: [[1.8, 1.8], [4.2, 1.8], [1.8, 4.2], [4.2, 4.2]],
-          yellow: [[10.8, 1.8], [13.2, 1.8], [10.8, 4.2], [13.2, 4.2]],
-          red: [[1.8, 10.8], [4.2, 10.8], [1.8, 13.2], [4.2, 13.2]],
-          blue: [[10.8, 10.8], [13.2, 10.8], [10.8, 13.2], [13.2, 13.2]],
+        const svgWellCenters = {
+          green:  [[44, 44],  [100, 44],  [44, 100],  [100, 100]],
+          yellow: [[260, 44], [316, 44], [260, 100], [316, 100]],
+          red:    [[44, 260], [100, 260], [44, 316],  [100, 316]],
+          blue:   [[260, 260],[316, 260],[260, 316], [316, 316]],
         };
-        const [gx, gy] = wellPositions[color][tok.id];
-        return { x: gx * cell, y: gy * cell };
+        const [sx, sy] = svgWellCenters[color][tok.id];
+        return { x: sx * scale, y: sy * scale };
       }
+
+      // FINISHED (Home Triangle Center)
       if (tok.position === 999) {
-        const goalOffsets = { red: [7.5, 8.0], green: [7.0, 7.5], yellow: [7.5, 7.0], blue: [8.0, 7.5] };
-        const [gx, gy] = goalOffsets[color];
+        const homeOffsets = {
+          red:    [7.5, 8.4],
+          green:  [6.6, 7.5],
+          yellow: [7.5, 6.6],
+          blue:   [8.4, 7.5]
+        };
+        const [gx, gy] = homeOffsets[color];
         return { x: gx * cell, y: gy * cell };
       }
+
+      // HOME COLUMN RUNWAY (Steps 51 to 55 -> Positions 100 to 104)
       if (tok.position >= 100) {
-        const step = tok.position - 100 + 1;
+        const step = tok.position - 100 + 1; // 1 to 5
         let c = 7, r = 7;
         if (color === 'red') { c = 7; r = 14 - step; }
         else if (color === 'green') { c = step; r = 7; }
@@ -1389,6 +1386,8 @@
         else if (color === 'blue') { c = 14 - step; r = 7; }
         return { x: (c + 0.5) * cell, y: (r + 0.5) * cell };
       }
+
+      // MAIN TRACK (0 to 51)
       const [c, r] = TRACK_COORDS[tok.position];
       return { x: (c + 0.5) * cell, y: (r + 0.5) * cell };
     }
