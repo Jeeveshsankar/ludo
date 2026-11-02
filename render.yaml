@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: heysakhi-ludo-backend
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: GIN_MODE
+        value: release
