@@ -1033,30 +1033,42 @@
     }
 
     function initWebSocket(code, token) {
-      if (activeSocket) activeSocket.close();
-      activeSocket = new WebSocket(`${WS_URL}?room=${code}&token=${token}`);
+      if (activeSocket) {
+        try { activeSocket.close(); } catch(e) {}
+      }
+      try {
+        if (!WS_URL || WS_URL.includes('undefined')) return;
+        activeSocket = new WebSocket(`${WS_URL}?room=${code}&token=${token}`);
 
-      activeSocket.onmessage = (event) => {
-        try {
-          const { event: evName, payload } = JSON.parse(event.data);
-          if (evName === 'room.updated' || evName === 'room.player_joined' || evName === 'room.player_left') {
-            onlineRoomData = payload;
-            renderLobbyUI();
-          } else if (evName === 'game.started') {
-            onlineRoomData = payload;
-            launchOnlineGameplay();
-          } else if (evName === 'game.dice_result' || evName === 'game.token_moved' || evName === 'game.turn_changed') {
-            onlineRoomData = payload.room || payload;
-            syncOnlineGameState();
-          } else if (evName === 'game.player_won') {
-            onlineRoomData = payload.room;
-            alert(`🎉 Congratulations! Winner: ${payload.winner_id}`);
-            navigateToScreen('screen-home');
+        activeSocket.onmessage = (event) => {
+          try {
+            const { event: evName, payload } = JSON.parse(event.data);
+            if (evName === 'room.updated' || evName === 'room.player_joined' || evName === 'room.player_left') {
+              onlineRoomData = payload;
+              renderLobbyUI();
+            } else if (evName === 'game.started') {
+              onlineRoomData = payload;
+              launchOnlineGameplay();
+            } else if (evName === 'game.dice_result' || evName === 'game.token_moved' || evName === 'game.turn_changed') {
+              onlineRoomData = payload.room || payload;
+              syncOnlineGameState();
+            } else if (evName === 'game.player_won') {
+              onlineRoomData = payload.room;
+              alert(`🎉 Congratulations! Winner: ${payload.winner_id}`);
+              navigateToScreen('screen-home');
+            }
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          console.error(e);
-        }
-      };
+        };
+
+        activeSocket.onerror = (err) => {
+          console.warn('WebSocket connection note:', err);
+        };
+      } catch (err) {
+        console.warn('WebSocket initialization note:', err);
+      }
+    }
     }
 
     function renderLobbyUI() {
