@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { GameState, initializeGame, rollDice, applyMove, PlayerColor } from '../engine/LudoEngineTS';
 
-const BACKEND_BASE = 'http://localhost:8082';
-const WS_BASE = 'ws://localhost:8082/ws';
+const BACKEND_BASE = 'https://heysakhi-ludo.vercel.app';
+const WS_BASE = 'wss://heysakhi-ludo.vercel.app/ws';
 
 export interface RoomPlayer {
   user_id: string;
