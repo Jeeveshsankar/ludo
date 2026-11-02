@@ -31,118 +31,49 @@
     }
 
     body {
-      background: radial-gradient(120% 120% at 50% 0%, #FAF5FF 0%, #F5F3FF 45%, #EFF6FF 100%);
+      background: #FAFAFD;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
+      min-height: -webkit-fill-available;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 12px;
+      justify-content: flex-start;
+      margin: 0;
+      padding: 0;
       color: var(--text-dark);
       overflow-x: hidden;
     }
 
-    /* Ambient Glow Orbs */
-    .ambient-glow {
-      position: fixed;
-      width: 450px;
-      height: 450px;
-      border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.35;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .glow-1 { top: -100px; left: calc(50% - 300px); background: #E9D5FF; }
-    .glow-2 { bottom: -100px; right: calc(50% - 300px); background: #FCE7F3; }
-
-    /* Top Brand Minimal Bar */
-    .brand-topbar {
-      margin-bottom: 8px;
-      text-align: center;
-      z-index: 10;
-    }
-    .brand-topbar h1 {
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: 3px;
-      background: linear-gradient(135deg, #6D28D9 0%, #EC4899 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .brand-topbar p {
-      font-size: 10px;
-      color: var(--text-muted);
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-top: 1px;
-    }
-
-    /* Device Mockup Frame: Scaled perfectly to fit viewport */
+    /* Native App Container: Full-screen native experience on mobile, sleek centered shell on desktop */
     .device-viewport {
-      width: 380px;
-      height: 750px;
-      max-height: calc(100vh - 40px);
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      min-height: 100dvh;
       background: #FFFFFF;
-      border-radius: 46px;
-      box-shadow: 
-        0 25px 60px -12px rgba(124, 58, 237, 0.18),
-        0 0 0 8px #FFFFFF,
-        0 0 0 10px rgba(226, 232, 240, 0.8),
-        inset 0 0 20px rgba(124, 58, 237, 0.02);
+      margin: 0 auto;
       position: relative;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
       z-index: 10;
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 0 40px rgba(124, 58, 237, 0.08);
+      border-left: 1px solid rgba(226, 232, 240, 0.6);
+      border-right: 1px solid rgba(226, 232, 240, 0.6);
+      padding-top: env(safe-area-inset-top, 10px);
+      padding-bottom: env(safe-area-inset-bottom, 12px);
     }
 
-    /* Dynamic Island */
-    .dynamic-island {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 106px;
-      height: 26px;
-      background: #000000;
-      border-radius: 18px;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-    .island-lens {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: #111;
-      border: 1px solid #333;
-    }
-    .island-dot {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: #0E3A5A;
-    }
-
-    /* Native Status Bar (Proper Top Spacing) */
-    .status-bar {
-      height: 44px;
-      padding: 12px 24px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-dark);
-      z-index: 90;
-      background: transparent;
+    @media (max-width: 480px) {
+      body {
+        background: #FFFFFF;
+      }
+      .device-viewport {
+        max-width: 100%;
+        border-left: none;
+        border-right: none;
+        box-shadow: none;
+      }
     }
 
     /* App Screen Container */
@@ -518,23 +449,8 @@
 </head>
 <body>
 
-  <!-- Ambient Glow Background -->
-  <div class="ambient-glow glow-1"></div>
-  <div class="ambient-glow glow-2"></div>
-
-  <!-- Mobile Viewport Frame -->
+  <!-- Native App Container (Full Screen on Mobile, Clean Center on Desktop) -->
   <div class="device-viewport">
-    <!-- Dynamic Island -->
-    <div class="dynamic-island">
-      <div class="island-lens"></div>
-      <div class="island-dot"></div>
-    </div>
-
-    <!-- Status Bar (Clean & Proper Top Spacing) -->
-    <div class="status-bar">
-      <span>9:41</span>
-      <span>5G &nbsp; 100%</span>
-    </div>
 
     <!-- ============================================== -->
     <!-- 1. SCREEN: HOME (Apple Minimalist Edition)    -->
@@ -828,9 +744,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Home Indicator Bar -->
-    <div class="home-indicator-bar"></div>
   </div>
 
   <script>
